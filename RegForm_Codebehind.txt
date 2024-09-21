@@ -1,0 +1,110 @@
+RegForm.aspx.vb
+----------------------------
+Imports System.Data
+Imports System.Data.SqlClient
+Imports System.IO
+Partial Class SAM_RegForm
+    Inherits System.Web.UI.Page
+    Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
+        If Not Request.QueryString("Mode") Is Nothing Then
+            hdnMode.Value = Request.QueryString("Mode")
+        End If
+        If Not Request.QueryString("RegistrationId") Is Nothing Then
+            hdnRegId.Value = Request.QueryString("RegistrationId")
+        End If
+
+        If (hdnMode.Value <> "add") Then
+            GetDetails(hdnRegId.Value)
+        End If
+    End Sub
+    Private Sub GetDetails(ByVal RegId As String)
+        Dim connectionString = "ConStrMain"
+        Dim sqlCon = New SqlConnection(connectionString)
+       
+        sqlCon.Open()
+
+        Dim mySqlCmd = New SqlCommand
+
+
+        mySqlCmd.Connection = sqlCon
+        mySqlCmd.CommandTimeout = 0
+
+        mySqlCmd = New SqlCommand("Get_Registration", sqlCon)
+        mySqlCmd.CommandType = CommandType.StoredProcedure
+
+        mySqlCmd.Parameters.AddWithValue("@RegId", RegId)
+
+
+
+        Dim reader As SqlDataReader = mySqlCmd.ExecuteReader
+        Dim dt As New DataTable
+        dt.Load(reader)
+        txtFirstName.Value = dt.Rows(0)("FirstName")
+        txtMiddleName.Value = dt.Rows(0)("MiddleName")
+        txtLastName.Value = dt.Rows(0)("LastName")
+        ddlCourse.Value = dt.Rows(0)("Course")
+
+        If dt.Rows(0)("Course") = "Male" Then
+            rbtnMale.Checked = True
+        ElseIf dt.Rows(0)("Course") = "Female" Then
+            rbtnFeMale.Checked = True
+        Else
+            rbtnOther.Checked = True
+        End If
+
+        txtCountryCode.Value = dt.Rows(0)("CountryCode")
+        txtPhoneNo.Value = dt.Rows(0)("PhoneNo")
+        txtAddress.Value = dt.Rows(0)("Address")
+        txtEmail.Value = dt.Rows(0)("Email")
+        txtPassWord.Value = dt.Rows(0)("PassWord")
+        
+        sqlCon.Close()
+
+    End Sub
+    Protected Sub btnSubmit_Click(sender As Object, e As EventArgs)
+        Dim connectionString = "ConStrMain"
+        Dim sqlCon = New SqlConnection(connectionString)
+        Dim sqlTrans As SqlTransaction
+
+        sqlCon.Open()
+        sqlTrans = sqlCon.BeginTransaction()
+        Dim mySqlCmd = New SqlCommand
+
+
+        mySqlCmd.Connection = sqlCon
+        mySqlCmd.Transaction = sqlTrans
+        mySqlCmd.CommandTimeout = 0
+
+
+        mySqlCmd = New SqlCommand("Add_Registration", sqlCon, sqlTrans)
+        mySqlCmd.CommandType = CommandType.StoredProcedure
+
+        mySqlCmd.Parameters.AddWithValue("@RegId", hdnRegId.Value)
+        mySqlCmd.Parameters.AddWithValue("@Mode", hdnMode.Value)
+        mySqlCmd.Parameters.AddWithValue("@FirstName", txtFirstName.Value)
+        mySqlCmd.Parameters.AddWithValue("@MiddleName", txtMiddleName.Value)
+        mySqlCmd.Parameters.AddWithValue("@LastName", txtLastName.Value)
+        mySqlCmd.Parameters.AddWithValue("@Course", ddlCourse.Value)
+        If rbtnMale.Checked = True Then
+            mySqlCmd.Parameters.AddWithValue("@Gender", rbtnMale.Value)
+        ElseIf rbtnFeMale.Checked = True Then
+            mySqlCmd.Parameters.AddWithValue("@Gender", rbtnFeMale.Value)
+        Else
+            mySqlCmd.Parameters.AddWithValue("@Gender", rbtnOther.Value)
+        End If
+
+        mySqlCmd.Parameters.AddWithValue("@CountryCode", txtCountryCode.Value)
+        mySqlCmd.Parameters.AddWithValue("@PhoneNo", txtPhoneNo.Value)
+        mySqlCmd.Parameters.AddWithValue("@Address", txtAddress.Value)
+        mySqlCmd.Parameters.AddWithValue("@Email", txtEmail.Value)
+        mySqlCmd.Parameters.AddWithValue("@PassWord", txtPassWord.Value)
+
+        
+
+        mySqlCmd.ExecuteNonQuery()
+        sqlTrans.Commit()    'SQl Tarn Commit
+        sqlCon.Close()
+        ScriptManager.RegisterClientScriptBlock(Page, GetType(Page), "", "alert('Details Saved successfully.' );", True)
+        Response.Redirect("StudentList.aspx")
+    End Sub
+End Class

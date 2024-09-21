@@ -1,0 +1,75 @@
+
+
+--Query for Sequence (Registration table
+CREATE SEQUENCE [dbo].[seq_tbl_Registration] 
+ AS [bigint]
+ START WITH 7
+ INCREMENT BY 1
+ MINVALUE -9223372036854775808
+ MAXVALUE 9223372036854775807
+ CACHE 
+GO
+
+--Query for table (registration table) 
+CREATE TABLE [dbo].[tbl_Registration](
+	[RegId] [bigint] NOT NULL,
+	[FirstName] [varchar](100) NULL,
+	[MiddleName][varchar](100) NULL,
+	[LastName] [varchar](100) NULL,
+	[Course] [varchar](100) NULL,
+	[Gender] [varchar](100) NULL,
+	[CountryCode] [varchar](100) NULL,
+	[PhoneNo] [varchar](100) NULL,
+	[Address] [varchar](max) NULL,
+	[Email] [varchar](100) NULL,
+	[PassWord] [varchar](100) NULL
+ CONSTRAINT [PK_tbl_Registration] PRIMARY KEY CLUSTERED 
+(
+	[RegId] ASC
+))
+GO
+ALTER TABLE [dbo].[tbl_Registration] ADD  CONSTRAINT [DF_tbl_Registration_RegId]  DEFAULT (NEXT VALUE FOR [seq_tbl_Registration]) FOR [RegId]
+GO
+
+--Stored Procedure for save and edit
+CREATE PROCEDURE Add_Registration 
+	 @RegId bigint=0,
+	 @Mode varchar(100)='add',
+	 @FirstName varchar(1000),
+	 @MiddleName varchar(1000),
+	 @LastName varchar(1000),
+	 @Course varchar(1000),
+	 @Gender varchar(1000),
+	 @CountryCode varchar(1000),
+	 @PhoneNo varchar(1000),
+	 @Address varchar(1000),
+	 @Email varchar(1000),
+	 @PassWord varchar(1000)
+AS
+BEGIN
+	IF(@Mode = 'add')
+	begin
+
+	insert into tbl_Registration(FirstName,MiddleName,LastName,Course,Gender,CountryCode,PhoneNo,Address,Email,PassWord)
+	values(@Mode,@FirstName,@MiddleName,@LastName,@Course , @Gender ,@CountryCode,@PhoneNo,@Address , @Email , @PassWord)
+	end
+	else
+	begin
+	update tbl_Registration set
+		FirstName=@FirstName,MiddleName=@MiddleName,LastName=@LastName,Course=@Course,Gender=@Gender,CountryCode=@CountryCode,
+		PhoneNo=@PhoneNo,Address=@Address,Email=@Email,PassWord=@PassWord
+		where RegId=@RegId
+	end
+
+END
+GO
+
+--stored procedure for get data for edit in registration form
+CREATE PROCEDURE Get_Registration 
+	@RegId bigint
+AS
+BEGIN
+	select FirstName,MiddleName,LastName,Course,Gender,CountryCode,PhoneNo,Address,Email,PassWord from tbl_Registration(nolock)
+	where tbl_Registration.RegId=@RegId
+	END
+GO
