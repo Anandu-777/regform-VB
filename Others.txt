@@ -3,4 +3,4 @@ Connection String in web.config
 -------------------------------------------------\
 
 
- <add name="ConStrMain" connectionString="Data Source=192.168.20.6\SQLSERVER2017EXP;Initial Catalog=Wimpey_SIManagement;Persist Security Info=True;User ID=sa;Password=Limsdubai2017;Connect Timeout=200;Pooling='True';Max Pool Size=200" providerName="System.Data.SqlClient" />
+ <add name="ConStrMain" connectionString="Data Source=192.168.20.6\SQLSERVER2017EXP;Initial Catalog=Wimpey_SIManagement;Persist Security Info=True;User ID=sa;Password=Limsdubai2017; providerName="System.Data.SqlClient" />

@@ -1,0 +1,93 @@
+RegList.aspx
+------------------------------------------------------
+
+<%@ Page Language="VB" AutoEventWireup="false" CodeFile="RegList.aspx.vb" Inherits="SAM_RegList" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <a href ="RegForm.aspx" style ="text-align :right;"> Add new</a>
+        <centre>
+    <asp:GridView ID="gv_Reg" runat="server" Width="100%" AllowPaging="True" AutoGenerateColumns="False" DataKeyNames="RegId" >
+                                        <Columns>
+                                            
+                                            <asp:BoundField DataField="FirstName" HeaderText="FirstName">
+                                            </asp:BoundField>
+                                              <asp:BoundField DataField="MiddleName" HeaderText="MiddleName">
+                                            </asp:BoundField>
+                                             <asp:BoundField DataField="LastName" HeaderText="LastName">
+                                            </asp:BoundField>
+                                             <asp:BoundField DataField="Course" HeaderText="Course">
+                                            </asp:BoundField>
+                                             <asp:BoundField DataField="PhoneNo" HeaderText="PhoneNo">
+                                            </asp:BoundField>
+                                             
+                                        </Columns>
+                                        <EmptyDataTemplate>
+                                            <div>
+                                                Records not found.
+                                            </div>
+                                        </EmptyDataTemplate>
+
+                                    </asp:GridView>
+            </centre>
+    </div>
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+RegList.aspx.vb
+-------------------------------------------------------
+Imports System.Data
+Imports System.Data.SqlClient
+Imports System.IO
+Imports System.Web.Services
+
+Partial Class SAM_RegList
+    Inherits System.Web.UI.Page
+
+    Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
+        
+       
+        BindList()
+                
+
+    End Sub
+
+    Private Sub BindList()
+        Dim myDS As New DataSet
+        Dim strQry As String = ""
+        Dim connectionString = "ConStrMain"
+        Dim sqlCon = New SqlConnection(connectionString)
+
+        sqlCon.Open()
+        Try
+            strQry = "SELECT * FROM tbl_Registration(nolock) where 1=1 "
+            Dim myDataAdapter As SqlDataAdapter
+            myDataAdapter = New SqlDataAdapter(strQry, sqlCon)
+            myDataAdapter.Fill(myDS)
+            gv_Reg.DataSource = myDS
+            gv_Reg.DataBind()
+
+        Catch ex As Exception
+
+        Finally
+            If sqlCon.State = ConnectionState.Open Then
+                clsDBConnect.dbConnectionClose(sqlCon)
+            End If
+        End Try
+    End Sub
+End Class
