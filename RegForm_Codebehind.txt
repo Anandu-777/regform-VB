@@ -44,5 +44,6 @@ Partial Class Registration_RegForm
         sqlTrans.Commit()    'SQl Tarn Commit
         sqlCon.Close()
         ScriptManager.RegisterClientScriptBlock(Page, GetType(Page), "", "alert('Details Saved successfully.' );", True)
+        Response.Redirect("RegList.aspx")
     End Sub
 End Class
